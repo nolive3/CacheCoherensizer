@@ -11,6 +11,8 @@ extern Simulator *Sim;
 MOESIF_protocol::MOESIF_protocol (Hash_table *my_table, Hash_entry *my_entry)
 	: Protocol (my_table, my_entry)
 {
+	// Initialize lines to not have the data yet!
+	this->state = MOESIF_CACHE_I;
 }
 
 MOESIF_protocol::~MOESIF_protocol ()
