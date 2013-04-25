@@ -9,36 +9,36 @@ extern Simulator *Sim;
  * Constructor/Destructor.
  *************************/
 MOESI_protocol::MOESI_protocol (Hash_table *my_table, Hash_entry *my_entry)
-    : Protocol (my_table, my_entry)
+	: Protocol (my_table, my_entry)
 {
 }
 
 MOESI_protocol::~MOESI_protocol ()
-{    
+{	
 }
 
 void MOESI_protocol::dump (void)
 {
-    const char *block_states[6] = {"X","I","S","E","O","M"};
-    fprintf (stderr, "MOESI_protocol - state: %s\n", block_states[state]);
+	const char *block_states[6] = {"X","I","S","E","O","M"};
+	fprintf (stderr, "MOESI_protocol - state: %s\n", block_states[state]);
 }
 
 void MOESI_protocol::process_cache_request (Mreq *request)
 {
 	switch (state) {
 
-    default:
-        fatal_error ("Invalid Cache State for MOESI Protocol\n");
-    }
+	default:
+		fatal_error ("Invalid Cache State for MOESI Protocol\n");
+	}
 }
 
 void MOESI_protocol::process_snoop_request (Mreq *request)
 {
 	switch (state) {
 
-    default:
-    	fatal_error ("Invalid Cache State for MOESI Protocol\n");
-    }
+	default:
+		fatal_error ("Invalid Cache State for MOESI Protocol\n");
+	}
 }
 
 inline void MOESI_protocol::do_cache_I (Mreq *request)

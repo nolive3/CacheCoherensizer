@@ -2,7 +2,7 @@
  * messages.cpp
  *
  *  Created on: Apr 8, 2011
- *      Author: japoovey
+ *	  Author: japoovey
  */
 #include "messages.h"
 #include "../sim/mreq.h"
@@ -14,15 +14,15 @@
 
 const char * Mreq::message_t_str[MREQ_MESSAGE_NUM] = {
 
-    "NOP",
+	"NOP",
 
-    "LOAD",
-    "STORE",
+	"LOAD",
+	"STORE",
 
-    "GETS",
-    "GETM",
+	"GETS",
+	"GETM",
 
-    "DATA",
+	"DATA",
 
-    "MREQ_INVALID"
+	"MREQ_INVALID"
 };

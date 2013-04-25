@@ -7,8 +7,8 @@ extern Simulator * Sim;
 
 Protocol::Protocol (Hash_table *my_table, Hash_entry *my_entry)
 {
-    this->my_table = my_table;
-    this->my_entry = my_entry;
+	this->my_table = my_table;
+	this->my_entry = my_entry;
 }
 
 Protocol::~Protocol ()

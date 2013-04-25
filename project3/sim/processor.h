@@ -18,16 +18,16 @@ public:
 	Processor(ModuleID moduleID, Hash_table *cache, char *trace_file);
 	~Processor();
 
-    FILE *infile;
-    Hash_table *my_cache;
+	FILE *infile;
+	Hash_table *my_cache;
 
-    bool end_of_trace;
-    bool outstanding_request;
+	bool end_of_trace;
+	bool outstanding_request;
 
-    Mreq * inbound_request;
-    Mreq * inbound_request_buf;
+	Mreq * inbound_request;
+	Mreq * inbound_request_buf;
 
-    bool done ();
+	bool done ();
 
 	void tick ();
 	void tock ();

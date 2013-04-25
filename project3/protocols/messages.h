@@ -2,7 +2,7 @@
  * messages.h
  *
  *  Created on: Apr 8, 2011
- *      Author: japoovey
+ *	  Author: japoovey
  */
 
 #ifndef MESSAGES_H_
@@ -14,17 +14,17 @@
 
 typedef enum
 {
-    NOP = 0,
+	NOP = 0,
 
 	LOAD,
 	STORE,
 
-    GETS,
-    GETM,
+	GETS,
+	GETM,
 
-    DATA,
+	DATA,
 
-    MREQ_INVALID,
+	MREQ_INVALID,
 	MREQ_MESSAGE_NUM	// Use this to make a Stat Array of message types
 } message_t;
 
