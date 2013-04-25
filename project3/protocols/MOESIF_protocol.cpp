@@ -141,6 +141,7 @@ inline void MOESIF_protocol::do_cache_E (Mreq *request)
 	case STORE:
 		send_DATA_to_proc(request->addr);
 		//silent upgrade :D
+		Sim->silent_upgrades++;
 		state = MOESIF_CACHE_M;
 		break;
 	default:
