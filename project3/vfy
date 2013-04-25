@@ -3,5 +3,5 @@ if [ $# -ne 2 ]
 	then echo "Usage: $0 tracedir protocol"
 	exit 1
 fi
-./sim_trace -t $1 -p $2 2> tmp && diff $1/$2_validation.txt tmp > /dev/null 2> /dev/null && echo "Win!" || echo "Fail!"
+./sim_trace -t $1 -p $2 2> tmp && diff $1/$2_validation.txt tmp >tmp.diff 2> tmp.diff && echo "Win!" || echo "Fail!"
 
