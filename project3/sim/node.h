@@ -12,21 +12,21 @@ class Predictor;
 class Node
 {
 public:
-	int nodeID;
-	map<module_t, Module*> mod;
+    int nodeID;
+    map<module_t, Module*> mod;
 
-	Node (int nodeID);
-	~Node ();
+    Node (int nodeID);
+    ~Node ();
 
-	Predictor *predictor;
+    Predictor *predictor;
 
-	void build_processor (char *trace_file);
-	void build_memory_controller (void);
-	
-	void tick_cache (void);
-	void tick_pr (void);
-	void tick_mc (void);
-	void tock_pr (void);
+    void build_processor (char *trace_file);
+    void build_memory_controller (void);
+    
+    void tick_cache (void);
+    void tick_pr (void);
+    void tick_mc (void);
+    void tock_pr (void);
 };
 
 #endif /* NODE_H_ */

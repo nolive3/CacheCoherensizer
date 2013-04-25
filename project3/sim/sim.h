@@ -19,32 +19,32 @@ void fatal_error (const char *fmt, ...) __attribute__ ((noreturn));
 
 class Simulator {
 public:
-	Simulator ();
-	~Simulator ();
+    Simulator ();
+    ~Simulator ();
 
-	timestamp_t global_clock;
+    timestamp_t global_clock;
 
-	Node **Nd;
-	Bus *bus;
+    Node **Nd;
+    Bus *bus;
 
-	/** Run/Fini for simulator.  */
-	void run (void);
-	void dump_stats (void);
+    /** Run/Fini for simulator.  */
+    void run (void);
+    void dump_stats (void);
 
-	/** Accessor functions */
-	Processor *get_PR (int node);
-	Hash_table *get_L1 (int node);
-	Memory_controller *get_MC (int node);
+    /** Accessor functions */
+    Processor *get_PR (int node);
+    Hash_table *get_L1 (int node);
+    Memory_controller *get_MC (int node);
 
-	/** Debug.  */
-	void dump_processors (void);
+    /** Debug.  */
+    void dump_processors (void);
 	void dump_outstanding_requests (int nodeID);
-	void dump_cache_block (int nodeID, paddr_t addr);
+    void dump_cache_block (int nodeID, paddr_t addr);
 
-	unsigned long int cache_misses;
-	unsigned long int cache_accesses;
-	unsigned long int silent_upgrades;
-	unsigned long int cache_to_cache_transfers;
+    unsigned long int cache_misses;
+    unsigned long int cache_accesses;
+    unsigned long int silent_upgrades;
+    unsigned long int cache_to_cache_transfers;
 };
 
 #endif

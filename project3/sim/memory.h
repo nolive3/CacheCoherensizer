@@ -18,12 +18,12 @@ public:
 	Memory_controller(ModuleID moduleID, int hit_time);
 	~Memory_controller();
 
-	int hit_time;
+    int hit_time;
 
-	bool request_in_progress;
-	timestamp_t data_time;
-	paddr_t data_addr;
-	ModuleID data_target;
+    bool request_in_progress;
+    timestamp_t data_time;
+    paddr_t data_addr;
+    ModuleID data_target;
 
 	void tick();
 	void tock();
