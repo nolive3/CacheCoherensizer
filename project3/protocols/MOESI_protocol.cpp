@@ -25,45 +25,46 @@ void MOESI_protocol::dump (void)
 	fprintf (stderr, "MOESI_protocol - state: %s\n", block_states[state]);
 }
 
+
+#define TYPE(rest) MOESI ## rest
 //Redirect work to the appropriate function
-void MOESI_protocol::process_cache_request (Mreq *request)
+void TYPE(_protocol)::process_cache_request (Mreq *request)
 {
 	switch (state) {
-	case MOESI_CACHE_I: do_cache_I (request); break;
-	case MOESI_CACHE_S: do_cache_S (request); break;
-	case MOESI_CACHE_E: do_cache_E (request); break;
-	case MOESI_CACHE_O: do_cache_O (request); break;
-	case MOESI_CACHE_M: do_cache_M (request); break;
-	case MOESI_CACHE_IE: do_cache_IE (request); break;
-	case MOESI_CACHE_IM: do_cache_IM (request); break;
-	case MOESI_CACHE_SM: do_cache_SM (request); break;
-	case MOESI_CACHE_FM: do_cache_FM (request); break;
+	case TYPE(_CACHE_I): do_cache_I (request); break;
+	case TYPE(_CACHE_S): do_cache_S (request); break;
+	case TYPE(_CACHE_E): do_cache_E (request); break;
+	case TYPE(_CACHE_O): do_cache_O (request); break;
+	case TYPE(_CACHE_M): do_cache_M (request); break;
+	case TYPE(_CACHE_IE): do_cache_IE (request); break;
+	case TYPE(_CACHE_IM): do_cache_IM (request); break;
+	case TYPE(_CACHE_SM): do_cache_SM (request); break;
+	case TYPE(_CACHE_FM): do_cache_FM (request); break;
 
 	default:
-		fatal_error ("Invalid Cache State for MOESI Protocol\n");
+		fatal_error ("Invalid Cache State for TYPE Protocol\n");
+	}
+}
+//Redirect work to the appropriate function
+void TYPE(_protocol)::process_snoop_request (Mreq *request)
+{
+	switch (state) {
+	case TYPE(_CACHE_I): do_snoop_I (request); break;
+	case TYPE(_CACHE_S): do_snoop_S (request); break;
+	case TYPE(_CACHE_E): do_snoop_E (request); break;
+	case TYPE(_CACHE_O): do_snoop_O (request); break;
+	case TYPE(_CACHE_M): do_snoop_M (request); break;
+	case TYPE(_CACHE_IE): do_snoop_IE (request); break;
+	case TYPE(_CACHE_IM): do_snoop_IM (request); break;
+	case TYPE(_CACHE_SM): do_snoop_SM (request); break;
+	case TYPE(_CACHE_FM): do_snoop_FM (request); break;
+
+	default:
+		fatal_error ("Invalid Cache State for TYPE Protocol\n");
 	}
 }
 
-//Redirect work to the appropriate function
-void MOESI_protocol::process_snoop_request (Mreq *request)
-{
-	switch (state) {
-	case MOESI_CACHE_I: do_snoop_I (request); break;
-	case MOESI_CACHE_S: do_snoop_S (request); break;
-	case MOESI_CACHE_E: do_snoop_E (request); break;
-	case MOESI_CACHE_O: do_snoop_O (request); break;
-	case MOESI_CACHE_M: do_snoop_M (request); break;
-	case MOESI_CACHE_IE: do_snoop_IE (request); break;
-	case MOESI_CACHE_IM: do_snoop_IM (request); break;
-	case MOESI_CACHE_SM: do_snoop_SM (request); break;
-	case MOESI_CACHE_FM: do_snoop_FM (request); break;
-
-	default:
-		fatal_error ("Invalid Cache State for MOESI Protocol\n");
-	}
-}
-
-inline void MOESI_protocol::do_cache_I (Mreq *request)
+inline void TYPE(_protocol)::do_cache_I (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
@@ -71,13 +72,13 @@ inline void MOESI_protocol::do_cache_I (Mreq *request)
 	*/
 	case LOAD:
 		send_GETS(request->addr);
-		state = MOESI_CACHE_IE;
+		state = TYPE(_CACHE_IE);
 		/* This is a cache miss */
 		Sim->cache_misses++;
 		break;
 	case STORE:
 		send_GETM(request->addr);
-		state = MOESI_CACHE_IM;
+		state = TYPE(_CACHE_IM);
 		/* This is a cache miss */
 		Sim->cache_misses++;
 		break;
@@ -87,12 +88,11 @@ inline void MOESI_protocol::do_cache_I (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_cache_S (Mreq *request)
+inline void TYPE(_protocol)::do_cache_S (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  This is like F which 
-	  does not exist but not 
+	  This is like F but not 
 	  allowed to send datas
 	*/
 	case LOAD: 
@@ -103,7 +103,7 @@ inline void MOESI_protocol::do_cache_S (Mreq *request)
 		//same as F, we can haz dataz, but have to 
 		//pretend that we not can haz datas.
 		send_GETM(request->addr);
-		state = MOESI_CACHE_SM;
+		state = TYPE(_CACHE_SM);
 		/* This is a cache miss */
 		Sim->cache_misses++;
 		break;
@@ -113,7 +113,7 @@ inline void MOESI_protocol::do_cache_S (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_cache_E (Mreq *request)
+inline void TYPE(_protocol)::do_cache_E (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
@@ -129,7 +129,7 @@ inline void MOESI_protocol::do_cache_E (Mreq *request)
 		send_DATA_to_proc(request->addr);
 		//silent upgrade :D
 		Sim->silent_upgrades++;
-		state = MOESI_CACHE_M;
+		state = TYPE(_CACHE_M);
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
@@ -137,18 +137,18 @@ inline void MOESI_protocol::do_cache_E (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_cache_O (Mreq *request)
+inline void TYPE(_protocol)::do_cache_O (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Like F but now its dirty, and F doesnt exist
+	  Like F but now its dirty
 	*/
 	case LOAD://we can haz data, so yay!
 		send_DATA_to_proc(request->addr);
 		break;
 	case STORE://we can haz dataz, But cant use the dataz we can haz
 		send_GETM(request->addr);
-		state = MOESI_CACHE_FM;
+		state = TYPE(_CACHE_FM);
 		/* This is a cache miss */
 		Sim->cache_misses++;
 		break;
@@ -158,7 +158,7 @@ inline void MOESI_protocol::do_cache_O (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_cache_M (Mreq *request)
+inline void TYPE(_protocol)::do_cache_M (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
@@ -174,7 +174,7 @@ inline void MOESI_protocol::do_cache_M (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_cache_IE (Mreq *request)
+inline void TYPE(_protocol)::do_cache_IE (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
@@ -188,7 +188,7 @@ inline void MOESI_protocol::do_cache_IE (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_cache_IM (Mreq *request)
+inline void TYPE(_protocol)::do_cache_IM (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
@@ -202,7 +202,7 @@ inline void MOESI_protocol::do_cache_IM (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_cache_SM (Mreq *request)
+inline void TYPE(_protocol)::do_cache_SM (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
@@ -216,11 +216,11 @@ inline void MOESI_protocol::do_cache_SM (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_cache_FM (Mreq *request)
+inline void TYPE(_protocol)::do_cache_FM (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Still in O (or maybe O) but heading to M
+	  Still in F (or maybe O) but heading to M
 	*/
 	case LOAD:
 	case STORE://CPU should be bloked, so this cant happen
@@ -230,7 +230,7 @@ inline void MOESI_protocol::do_cache_FM (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_snoop_I (Mreq *request)
+inline void TYPE(_protocol)::do_snoop_I (Mreq *request)
 {
 	switch (request->msg) {
 	/*
@@ -248,7 +248,7 @@ inline void MOESI_protocol::do_snoop_I (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_snoop_S (Mreq *request)
+inline void TYPE(_protocol)::do_snoop_S (Mreq *request)
 {
 	switch (request->msg) {
 	/*
@@ -257,7 +257,7 @@ inline void MOESI_protocol::do_snoop_S (Mreq *request)
 	  description of this state
 	*/
 	case GETM:// I can haz invalidated
-		state = MOESI_CACHE_I;
+		state = TYPE(_CACHE_I);
 	case GETS:
 		// I can haz dataz, so let those 
 		//jerks know they are ruining 
@@ -271,7 +271,7 @@ inline void MOESI_protocol::do_snoop_S (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_snoop_E (Mreq *request)
+inline void TYPE(_protocol)::do_snoop_E (Mreq *request)
 {
 	switch (request->msg) {
 	/*
@@ -282,15 +282,14 @@ inline void MOESI_protocol::do_snoop_E (Mreq *request)
 	case GETM:
 		// I can haz invalidated, and also give the dataz
 		// and also those jerks ruining our fun times
-		state = MOESI_CACHE_I;
+		state = TYPE(_CACHE_I);
 		set_shared_line();
 		send_DATA_on_bus(request->addr,request->src_mid);
 		break;
 	case GETS:
-		// I can not be forwarder cuz he doesnt exist, 
-		//and also give the datas, 
+		// I cant be forwarder, and also give the datas, 
 		//and also those jerks
-		state = MOESI_CACHE_S;
+		state = TYPE(_CACHE_S);
 		set_shared_line();
 		send_DATA_on_bus(request->addr,request->src_mid);
 		break;
@@ -301,7 +300,7 @@ inline void MOESI_protocol::do_snoop_E (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_snoop_O (Mreq *request)
+inline void TYPE(_protocol)::do_snoop_O (Mreq *request)
 {
 	switch (request->msg) {
 	/*
@@ -310,7 +309,7 @@ inline void MOESI_protocol::do_snoop_O (Mreq *request)
 	  description of this state
 	*/
 	case GETM:// see F state
-		state = MOESI_CACHE_I;
+		state = TYPE(_CACHE_I);
 	case GETS:
 		set_shared_line();
 		send_DATA_on_bus(request->addr,request->src_mid);
@@ -322,7 +321,7 @@ inline void MOESI_protocol::do_snoop_O (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_snoop_M (Mreq *request)
+inline void TYPE(_protocol)::do_snoop_M (Mreq *request)
 {
 	switch (request->msg) {
 	/*
@@ -331,12 +330,12 @@ inline void MOESI_protocol::do_snoop_M (Mreq *request)
 	  description of this state
 	*/
 	case GETM:// See E state 
-		state = MOESI_CACHE_I;
+		state = TYPE(_CACHE_I);
 		set_shared_line();
 		send_DATA_on_bus(request->addr,request->src_mid);
 		break;
 	case GETS:
-		state = MOESI_CACHE_O;
+		state = TYPE(_CACHE_O);
 		set_shared_line();
 		send_DATA_on_bus(request->addr,request->src_mid);
 		break;
@@ -349,7 +348,7 @@ inline void MOESI_protocol::do_snoop_M (Mreq *request)
 
 
 
-inline void MOESI_protocol::do_snoop_IE (Mreq *request)
+inline void TYPE(_protocol)::do_snoop_IE (Mreq *request)
 {
 	switch (request->msg) {
 	/*
@@ -367,9 +366,9 @@ inline void MOESI_protocol::do_snoop_IE (Mreq *request)
 		send_DATA_to_proc(request->addr);
 		if (get_shared_line())
 		{
-			state = MOESI_CACHE_S;
+			state = TYPE(_CACHE_S);
 		} else {
-			state = MOESI_CACHE_E;
+			state = TYPE(_CACHE_E);
 		}
 		break;
 	default:
@@ -378,7 +377,7 @@ inline void MOESI_protocol::do_snoop_IE (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_snoop_IM (Mreq *request)
+inline void TYPE(_protocol)::do_snoop_IM (Mreq *request)
 {
 	switch (request->msg) {
 	/*
@@ -392,7 +391,7 @@ inline void MOESI_protocol::do_snoop_IM (Mreq *request)
 	case DATA://finaly can haz datas, and now we can 
 		//change it, so noone eles can haz them
 		send_DATA_to_proc(request->addr);
-		state = MOESI_CACHE_M;
+		state = TYPE(_CACHE_M);
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
@@ -400,7 +399,7 @@ inline void MOESI_protocol::do_snoop_IM (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_snoop_SM (Mreq *request)
+inline void TYPE(_protocol)::do_snoop_SM (Mreq *request)
 {
 	switch (request->msg) {
 	/*
@@ -411,13 +410,13 @@ inline void MOESI_protocol::do_snoop_SM (Mreq *request)
 	case GETM://if we see someones GETM we invalidate our dataz,
 		// so it is like we were in invalid before the CPU 
 		// asked for the memories
-		state = MOESI_CACHE_IM;
+		state = TYPE(_CACHE_IM);
 	case GETS://those jerks are reading whil im trying to write 
 		set_shared_line();
 		break;
 	case DATA://YAY! we can finaly haz dataz
 		send_DATA_to_proc(request->addr);
-		state = MOESI_CACHE_M;
+		state = TYPE(_CACHE_M);
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
@@ -425,7 +424,7 @@ inline void MOESI_protocol::do_snoop_SM (Mreq *request)
 	}
 }
 
-inline void MOESI_protocol::do_snoop_FM (Mreq *request)
+inline void TYPE(_protocol)::do_snoop_FM (Mreq *request)
 {
 	switch (request->msg) {
 	/*
@@ -434,14 +433,14 @@ inline void MOESI_protocol::do_snoop_FM (Mreq *request)
 	  description of this state
 	*/
 	case GETM: // if someone writes to the dataz, then invalidate
-		state = MOESI_CACHE_IM;
-	case GETS://technically in O, so give the dataz to the other guy
+		state = TYPE(_CACHE_IM);
+	case GETS://technically in F , so give the dataz to the other guy
 		send_DATA_on_bus(request->addr,request->src_mid);
 		set_shared_line();
 		break;
 	case DATA: // can haz dataz
 		send_DATA_to_proc(request->addr);
-		state = MOESI_CACHE_M;
+		state = TYPE(_CACHE_M);
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
