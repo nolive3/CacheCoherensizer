@@ -53,7 +53,6 @@ void TYPE_protocol::process_snoop_request (Mreq *request)
 	case TYPE_CACHE_E: do_snoop_E (request); break;
 	case TYPE_CACHE_O: do_snoop_O (request); break;
 	case TYPE_CACHE_M: do_snoop_M (request); break;
-	case TYPE_CACHE_F: do_snoop_F (request); break;
 	case TYPE_CACHE_IE: do_snoop_IE (request); break;
 	case TYPE_CACHE_IM: do_snoop_IM (request); break;
 	case TYPE_CACHE_SM: do_snoop_SM (request); break;
