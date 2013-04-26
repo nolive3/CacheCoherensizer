@@ -22,7 +22,7 @@ TYPE(_protocol)::~TYPE(_protocol) ()
 void TYPE(_protocol)::dump (void)
 {
 	const char *block_states[9] = {"X","I","S","E","O","M","F"};
-	fprintf (stderr, "TYPE(_protocol) - state: %s\n", block_states[state]);
+	fprintf (stderr, "MOESIF_protocol - state: %s\n", block_states[state]);
 }
 //Redirect work to the appropriate function
 void TYPE(_protocol)::process_cache_request (Mreq *request)
