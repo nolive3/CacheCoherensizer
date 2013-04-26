@@ -67,12 +67,18 @@ inline void MOESIF_protocol::do_cache_F (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Description of this state
+	  The F state contains
+	  clean data and is allowed 
+	  to give the data instead
+	  of the memory unit
 	*/
-	case LOAD:
+	case LOAD: 
+		// we have the datas so its all good
 		send_DATA_to_proc(request->addr);
 		break;
-	case STORE:
+	case STORE: 
+		// even tough we have the data everyone needs to 
+		//see the write at the same time, so we need to pretend we dont.
 		send_GETM(request->addr);
 		state = MOESIF_CACHE_FM;
 		/* This is a cache miss */
@@ -80,7 +86,7 @@ inline void MOESIF_protocol::do_cache_F (Mreq *request)
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: F state shouldn't see this message\n");
 	}
 }
 
@@ -88,7 +94,7 @@ inline void MOESIF_protocol::do_cache_I (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Description of this state
+	  No datas
 	*/
 	case LOAD:
 		send_GETS(request->addr);
@@ -112,12 +118,16 @@ inline void MOESIF_protocol::do_cache_S (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Description of this state
+	  This is like F but not 
+	  allowed to send datas
 	*/
-	case LOAD:
+	case LOAD: 
+		//can haz datas, so no problemz
 		send_DATA_to_proc(request->addr);
 		break;
-	case STORE:
+	case STORE: 
+		//same as F, we can haz dataz, but have to 
+		//pretend that we not can haz datas.
 		send_GETM(request->addr);
 		state = MOESIF_CACHE_SM;
 		/* This is a cache miss */
@@ -125,7 +135,7 @@ inline void MOESIF_protocol::do_cache_S (Mreq *request)
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: S state shouldn't see this message\n");
 	}
 }
 
@@ -133,12 +143,15 @@ inline void MOESIF_protocol::do_cache_E (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Description of this state
+	  In E we aare the only one with the data
+	  so we dont have to tell anyone anything
 	*/
-	case LOAD:
+	case LOAD: 
+		//we can haz data, so yay!
 		send_DATA_to_proc(request->addr);
 		break;
 	case STORE:
+		//we can haz data, so yay!
 		send_DATA_to_proc(request->addr);
 		//silent upgrade :D
 		Sim->silent_upgrades++;
@@ -146,7 +159,7 @@ inline void MOESIF_protocol::do_cache_E (Mreq *request)
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: E state shouldn't see this message\n");
 	}
 }
 
@@ -154,12 +167,12 @@ inline void MOESIF_protocol::do_cache_O (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Description of this state
+	  Like F but now its dirty
 	*/
-	case LOAD:
+	case LOAD://we can haz data, so yay!
 		send_DATA_to_proc(request->addr);
 		break;
-	case STORE:
+	case STORE://we can haz dataz, But cant use the dataz we can haz
 		send_GETM(request->addr);
 		state = MOESIF_CACHE_FM;
 		/* This is a cache miss */
@@ -167,7 +180,7 @@ inline void MOESIF_protocol::do_cache_O (Mreq *request)
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: O state shouldn't see this message\n");
 	}
 }
 
@@ -175,15 +188,15 @@ inline void MOESIF_protocol::do_cache_M (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Description of this state
+	  Like E but better (Cuz its dirty)
 	*/
 	case LOAD:
-	case STORE:
+	case STORE: // we dont have to do anything, COMPLETE FREEDOM
 		send_DATA_to_proc(request->addr);
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: M state shouldn't see this message\n");
 	}
 }
 
@@ -191,13 +204,13 @@ inline void MOESIF_protocol::do_cache_IE (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Description of this state
+	  Still in I but heading to E (or S if someone sets the shared line)
 	*/
 	case LOAD:
-	case STORE:
+	case STORE://CPU should be bloked, so this cant happen
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: IE state shouldn't see this message\n");
 	}
 }
 
@@ -205,13 +218,13 @@ inline void MOESIF_protocol::do_cache_IM (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Description of this state
+	  Still in I but heading to M
 	*/
 	case LOAD:
-	case STORE:
+	case STORE://CPU should be bloked, so this cant happen
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: IM state shouldn't see this message\n");
 	}
 }
 
@@ -219,13 +232,13 @@ inline void MOESIF_protocol::do_cache_SM (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Description of this state
+	  Still in S but heading to M
 	*/
 	case LOAD:
-	case STORE:
+	case STORE://CPU should be bloked, so this cant happen
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: SM state shouldn't see this message\n");
 	}
 }
 
@@ -233,13 +246,13 @@ inline void MOESIF_protocol::do_cache_FM (Mreq *request)
 {
 	switch (request->msg) {
 	/* 
-	  Description of this state
+	  Still in F (or maybe O) but heading to M
 	*/
 	case LOAD:
-	case STORE:
+	case STORE://CPU should be bloked, so this cant happen
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: FM state shouldn't see this message\n");
 	}
 }
 
@@ -247,18 +260,21 @@ inline void MOESIF_protocol::do_snoop_F (Mreq *request)
 {
 	switch (request->msg) {
 	/*
-	  Description of state
+	  See cache function 
+	  with same state for 
+	  description of this state
 	*/
-	case GETM:
+	case GETM: // I can haz invalidated
 		state = MOESIF_CACHE_I;
-	case GETS:
+		// note: no break, the stuff down there happens too
+	case GETS: // we are in F so they can haz dataz faster
 		set_shared_line();
 		send_DATA_on_bus(request->addr,request->src_mid);
 		break;
 	case DATA:
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: F state shouldn't see this message\n");
 	}
 }
 
@@ -266,11 +282,13 @@ inline void MOESIF_protocol::do_snoop_I (Mreq *request)
 {
 	switch (request->msg) {
 	/*
-	  Description of state
+	  See cache function 
+	  with same state for 
+	  description of this state
 	*/
 	case GETS:
 	case GETM:
-	case DATA:
+	case DATA://we cant haz data, so nothing to do
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
@@ -282,17 +300,22 @@ inline void MOESIF_protocol::do_snoop_S (Mreq *request)
 {
 	switch (request->msg) {
 	/*
-	  Description of state
+	  See cache function 
+	  with same state for 
+	  description of this state
 	*/
-	case GETM:
+	case GETM:// I can haz invalidated
 		state = MOESIF_CACHE_I;
 	case GETS:
+		// I can haz dataz, so let those 
+		//jerks know they are ruining 
+		//everything, and can not haz E state
 		set_shared_line();
 		break;
 	case DATA:
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: S state shouldn't see this message\n");
 	}
 }
 
@@ -300,14 +323,20 @@ inline void MOESIF_protocol::do_snoop_E (Mreq *request)
 {
 	switch (request->msg) {
 	/*
-	  Description of state
+	  See cache function 
+	  with same state for 
+	  description of this state
 	*/
 	case GETM:
+		// I can haz invalidated, and also give the dataz
+		// and also those jerks ruining our fun times
 		state = MOESIF_CACHE_I;
 		set_shared_line();
 		send_DATA_on_bus(request->addr,request->src_mid);
 		break;
 	case GETS:
+		// I can be forwarder, and also give the datas, 
+		//and also those jerks
 		state = MOESIF_CACHE_F;
 		set_shared_line();
 		send_DATA_on_bus(request->addr,request->src_mid);
@@ -315,7 +344,7 @@ inline void MOESIF_protocol::do_snoop_E (Mreq *request)
 	case DATA:
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: E state shouldn't see this message\n");
 	}
 }
 
@@ -323,9 +352,11 @@ inline void MOESIF_protocol::do_snoop_O (Mreq *request)
 {
 	switch (request->msg) {
 	/*
-	  Description of state
+	  See cache function 
+	  with same state for 
+	  description of this state
 	*/
-	case GETM:
+	case GETM:// see F state
 		state = MOESIF_CACHE_I;
 	case GETS:
 		set_shared_line();
@@ -334,7 +365,7 @@ inline void MOESIF_protocol::do_snoop_O (Mreq *request)
 	case DATA:
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: O state shouldn't see this message\n");
 	}
 }
 
@@ -342,9 +373,11 @@ inline void MOESIF_protocol::do_snoop_M (Mreq *request)
 {
 	switch (request->msg) {
 	/*
-	  Description of state
+	  See cache function 
+	  with same state for 
+	  description of this state
 	*/
-	case GETM:
+	case GETM:// See E state 
 		state = MOESIF_CACHE_I;
 		set_shared_line();
 		send_DATA_on_bus(request->addr,request->src_mid);
@@ -357,7 +390,7 @@ inline void MOESIF_protocol::do_snoop_M (Mreq *request)
 	case DATA:
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: M state shouldn't see this message\n");
 	}
 }
 
@@ -367,12 +400,17 @@ inline void MOESIF_protocol::do_snoop_IE (Mreq *request)
 {
 	switch (request->msg) {
 	/*
-	  Description of state
+	  See cache function 
+	  with same state for 
+	  description of this state
 	*/
 	case GETS:
 	case GETM:
 		break;
-	case DATA:
+	case DATA://we finaly can has dataz
+		// if anyone else says they haz the data then we go to S
+		// otherwize they are jerks, an so we /deserve/ exclusive 
+		// access
 		send_DATA_to_proc(request->addr);
 		if (get_shared_line())
 		{
@@ -383,7 +421,7 @@ inline void MOESIF_protocol::do_snoop_IE (Mreq *request)
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: IE state shouldn't see this message\n");
 	}
 }
 
@@ -391,18 +429,21 @@ inline void MOESIF_protocol::do_snoop_IM (Mreq *request)
 {
 	switch (request->msg) {
 	/*
-	  Description of state
+	  See cache function 
+	  with same state for 
+	  description of this state
 	*/
 	case GETS:
 	case GETM:
 		break;
-	case DATA:
+	case DATA://finaly can haz datas, and now we can 
+		//change it, so noone eles can haz them
 		send_DATA_to_proc(request->addr);
 		state = MOESIF_CACHE_M;
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: IM state shouldn't see this message\n");
 	}
 }
 
@@ -410,20 +451,24 @@ inline void MOESIF_protocol::do_snoop_SM (Mreq *request)
 {
 	switch (request->msg) {
 	/*
-	  Description of state
+	  See cache function 
+	  with same state for 
+	  description of this state
 	*/
-	case GETM:
+	case GETM://if we see someones GETM we invalidate our dataz,
+		// so it is like we were in invalid before the CPU 
+		// asked for the memories
 		state = MOESIF_CACHE_IM;
-	case GETS:
+	case GETS://those jerks are reading whil im trying to write 
 		set_shared_line();
 		break;
-	case DATA:
+	case DATA://YAY! we can finaly haz dataz
 		send_DATA_to_proc(request->addr);
 		state = MOESIF_CACHE_M;
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: SM state shouldn't see this message\n");
 	}
 }
 
@@ -431,21 +476,23 @@ inline void MOESIF_protocol::do_snoop_FM (Mreq *request)
 {
 	switch (request->msg) {
 	/*
-	  Description of state
+	  See cache function 
+	  with same state for 
+	  description of this state
 	*/
-	case GETM:
+	case GETM: // if someone writes to the dataz, then invalidate
 		state = MOESIF_CACHE_IM;
-	case GETS:
+	case GETS://technically in F , so give the dataz to the other guy
 		send_DATA_on_bus(request->addr,request->src_mid);
 		set_shared_line();
 		break;
-	case DATA:
+	case DATA: // can haz dataz
 		send_DATA_to_proc(request->addr);
 		state = MOESIF_CACHE_M;
 		break;
 	default:
 		request->print_msg (my_table->moduleID, "ERROR");
-		fatal_error ("Client: I state shouldn't see this message\n");
+		fatal_error ("Client: FM state shouldn't see this message\n");
 	}
 }
 
