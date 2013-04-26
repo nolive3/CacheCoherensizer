@@ -2,28 +2,30 @@
 #include "../sim/mreq.h"
 #include "../sim/sim.h"
 #include "../sim/hash_table.h"
-#define TYPE(rest) MOESIF ## rest
 extern Simulator *Sim;
 
 /*************************
  * Constructor/Destructor.
  *************************/
-TYPE(_protocol)::TYPE(_protocol) (Hash_table *my_table, Hash_entry *my_entry)
-	: Protocol (my_table, my_entry)
-{
-	// Initialize lines to not have the data yet!
-	this->state = TYPE(_CACHE_I);
-}
 
-TYPE(_protocol)::~TYPE(_protocol) ()
-{	
-}
-
-void TYPE(_protocol)::dump (void)
+void MOESIF_protocol::dump (void)
 {
 	const char *block_states[9] = {"X","I","S","E","O","M","F"};
 	fprintf (stderr, "MOESIF_protocol - state: %s\n", block_states[state]);
 }
+MOESIF_protocol::MOESIF_protocol (Hash_table *my_table, Hash_entry *my_entry)
+	: Protocol (my_table, my_entry)
+{
+	// Initialize lines to not have the data yet!
+	this->state = MOESIF_CACHE_I;
+}
+
+MOESIF_protocol::~MOESIF_protocol ()
+{	
+}
+
+
+#define TYPE(rest) MOESIF ## rest
 //Redirect work to the appropriate function
 void TYPE(_protocol)::process_cache_request (Mreq *request)
 {
