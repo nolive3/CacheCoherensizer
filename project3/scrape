@@ -1,0 +1,12 @@
+#!/bin/bash
+for i in {1..8} 
+do \
+#echo "Protocol Runtime" > exp$i.dat
+for j in MSI MOSI MESI MOESI MOESIF
+do \
+	#echo -n "$j "
+	./sim_trace -t traces/experiment"$i" -p $j 2>&1 | \
+	grep -e "Run Time:" | \
+	awk '{ print($3) }'
+done > exp$i.dat
+done

@@ -1,0 +1,18 @@
+#!/bin/bash
+if [ $# -ne 1 ]
+then \
+	echo "Usage: $0 expnum"
+	exit 1
+fi
+#Step 1: create file 
+echo "set title \"Experiment $1\"" > plotfile.gnu 
+echo "set xlabel \"Cache Protocol\"" >> plotfile.gnu 
+echo "set xtics (\"MSI\" 0, \"MOSI\" 1, \"MESI\" 2, \"MOESI\" 3, \"MOESIF\" 4)" >> plotfile.gnu
+echo "set term png" >> plotfile.gnu 
+echo "set output \"exp$1.png\"" >> plotfile.gnu 
+echo "\
+plot \"exp$1.dat\" using (\$1) title \"Runtime\" with linespoints\
+" >> plotfile.gnu 
+#Step 2: call gnuplot 
+gnuplot -p plotfile.gnu 
+
